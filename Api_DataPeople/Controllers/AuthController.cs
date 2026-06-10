@@ -58,7 +58,15 @@ namespace Api_DataPeople.Controllers
         // log out
         [HttpPost("logOut")]
         public IActionResult LogOut() {
-            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete(
+                "access_token",
+                new CookieOptions
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                }
+            );
+
             return Ok(new
             {
                 message="Sesión Cerrada."
