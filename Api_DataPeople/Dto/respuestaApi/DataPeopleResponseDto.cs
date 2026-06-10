@@ -1,4 +1,4 @@
-﻿namespace Api_DataPeople.DTO
+﻿namespace Api_DataPeople.Dto.respuestaApi
 {
     public class DataPeopleResponseDto
     {

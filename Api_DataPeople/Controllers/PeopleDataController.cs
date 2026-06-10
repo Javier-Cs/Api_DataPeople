@@ -1,5 +1,8 @@
-﻿using Api_DataPeople.Services;
+﻿using Api_DataPeople.DTO;
+using Api_DataPeople.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nottyn.Dtos.salida;
 
 namespace Api_DataPeople.Controllers
 {
@@ -13,8 +16,10 @@ namespace Api_DataPeople.Controllers
             _peopleDataService = peopleDataService;
         }
 
-        [HttpGet("{dato}")]
-        public async Task<IActionResult> GetDataPeople(string dato, CancellationToken ct) {
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetDataPeople([FromQuery]string dato, CancellationToken ct) {
             try
             {
                 var dataPeople = await _peopleDataService.GetDataPeople(dato, ct);
