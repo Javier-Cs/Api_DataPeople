@@ -1,8 +1,10 @@
 ﻿using Api_DataPeople.Dto.respuestaApi;
 using Api_DataPeople.DTO;
+using Api_DataPeople.Exceptions;
 using Api_DataPeople.Model;
 using Api_DataPeople.Repository;
 using Api_DataPeople.Validacion;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Nottyn.Dtos.salida;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -57,7 +59,10 @@ namespace Api_DataPeople.Services
 
             if (response == null) {
                 await _contarIntentosRepo.RegistrarIntentosFallidos(loginDto.Email, ip);
-                throw new Exception("credencial erronea.");
+                var intentosActuales = await _contarIntentosRepo.ContarIntentosUltimosMinutos(loginDto.Email);
+                var restantes = Math.Max(0,5 - intentosActuales);
+
+                throw new LoginException("Credenciales incorrectas.", restantes);
             }
 
             if (response.email == null) {
@@ -83,7 +88,11 @@ namespace Api_DataPeople.Services
 
 
             if (intentos >= 5) {
-                throw new Exception("Cuenta Bloqueada temporalmente por 30 min, ponte pilas.");
+                throw new LoginException(
+                    "Usuario bloqueado temporalmente por 30 minutos.",
+                    0,
+                    true
+                );
             }
 
             if (intentosPorIp >= 20) {
@@ -95,7 +104,12 @@ namespace Api_DataPeople.Services
             {
                 // como se obtiene la ip?
                 await _contarIntentosRepo.RegistrarIntentosFallidos(loginDto.Email, ip);
-                throw new Exception("credencial erronea, ponte pilas.");
+
+                var intentosActuales = await _contarIntentosRepo.ContarIntentosUltimosMinutos(loginDto.Email);
+
+                var restantes = Math.Max(0, 5 - intentosActuales);
+
+                throw new LoginException("credencial erronea, ponte pilas.", restantes);
             }
             else {
                 await _contarIntentosRepo.LimpiarIntentos(loginDto.Email);

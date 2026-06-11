@@ -1,4 +1,5 @@
 ﻿using Api_DataPeople.DTO;
+using Api_DataPeople.Exceptions;
 using Api_DataPeople.Services;
 using Api_DataPeople.Validacion;
 using Microsoft.AspNetCore.Authorization;
@@ -114,9 +115,14 @@ namespace Api_DataPeople.Controllers
                     usuario.rol,
                 });
             }
-            catch (Exception ex)
+            catch (LoginException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new
+                {
+                    message = ex.Message,
+                    intentosRestantes = ex.IntentosRestantes,
+                    bloqueado = ex.Bloqueado
+                });
             }
 
         }
